@@ -2,6 +2,7 @@ package com.ywyg.config;
 
 import com.ywyg.advice.MethodCostAdvice;
 import com.ywyg.annotation.AnnotationsClass;
+import com.ywyg.enumerate.OutType;
 import com.ywyg.es.EsService;
 import com.ywyg.es.RecordRepository;
 import com.ywyg.factory.RecordType;
@@ -12,6 +13,7 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -29,10 +31,6 @@ public class AutoConfiguration {
         return new RuntimeConfig();
     }
 
-    @Bean
-    public EsService esService(final RecordRepository recordRepository) {
-        return new EsService(recordRepository);
-    }
 
     @Bean
     @ConditionalOnBean(RuntimeConfig.class)
@@ -49,9 +47,15 @@ public class AutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnBean(value = {RuntimeConfig.class, EsService.class})
-    public RecordType recordType(final RuntimeConfig runtimeConfig, final EsService esService) {
-        return new RecordType(runtimeConfig, esService);
+    @ConditionalOnBean(value = {RuntimeConfig.class})
+    public RecordType recordType(final RuntimeConfig runtimeConfig, final ApplicationContext applicationContext) {
+        RecordType recordType = new RecordType();
+        recordType.setRuntimeConfig(runtimeConfig);
+        if (OutType.ELASTICSEARCH.equals(runtimeConfig.getOutType())) {
+            RecordRepository recordRepository = applicationContext.getBean("recordRepository", RecordRepository.class);
+            recordType.setEsService(new EsService(recordRepository));
+        }
+        return recordType;
     }
 
     @Bean

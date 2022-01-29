@@ -1,6 +1,6 @@
 runtime:
   annotations: "com.gv.example.annotation.forTest"
-  type: FILE
+  type: ELASTICSEARCH
   path: "/Users/saijie.gao/Desktop"
 spring:
   elasticsearch:

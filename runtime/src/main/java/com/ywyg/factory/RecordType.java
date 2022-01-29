@@ -7,6 +7,7 @@ import com.ywyg.out.OutConsole;
 import com.ywyg.out.OutEs;
 import com.ywyg.out.OutFile;
 import com.ywyg.out.OutResult;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -14,15 +15,11 @@ import lombok.extern.slf4j.Slf4j;
  * @date 2022/1/27
  */
 @Slf4j
+@Data
 public class RecordType {
 
-    private final RuntimeConfig runtimeConfig;
-    private final EsService esService;
-
-    public RecordType(RuntimeConfig runtimeConfig, EsService esService) {
-        this.runtimeConfig = runtimeConfig;
-        this.esService = esService;
-    }
+    private RuntimeConfig runtimeConfig;
+    private EsService esService;
 
     public OutResult outResult() {
         OutType outType = runtimeConfig.getOutType();

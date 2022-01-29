@@ -1,6 +1,7 @@
 package com.ywyg.es;
 
 import com.ywyg.template.RecordTemplate;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 
