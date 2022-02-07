@@ -1,6 +1,8 @@
 package com.ywyg.advice;
 
 import com.ywyg.out.OutResult;
+import com.ywyg.template.MethodUpper;
+import com.ywyg.template.RecordDefault;
 import com.ywyg.template.RecordTemplate;
 import com.ywyg.utils.VerifyAnnotation;
 import org.aopalliance.intercept.MethodInterceptor;
@@ -17,16 +19,18 @@ public class MethodCostAdvice implements MethodInterceptor {
 
     private final VerifyAnnotation verifyAnnotation;
     private final OutResult outResult;
+    private final MethodUpper methodUpper;
 
-    public MethodCostAdvice(VerifyAnnotation verifyAnnotation, OutResult outResult) {
+    public MethodCostAdvice(VerifyAnnotation verifyAnnotation, OutResult outResult, MethodUpper methodUpper) {
         this.verifyAnnotation = verifyAnnotation;
         this.outResult = outResult;
+        this.methodUpper = methodUpper;
     }
 
     @Override
     public Object invoke(MethodInvocation invocation) throws Throwable {
         if (verifyAnnotation.needRecord(invocation.getMethod())) {
-            return timeCost(invocation);
+            return methodUpper == null ? timeCost(invocation) : methodUpper.cost(invocation, outResult);
         } else {
             return invocation.proceed();
         }
@@ -36,7 +40,7 @@ public class MethodCostAdvice implements MethodInterceptor {
         long start = System.currentTimeMillis();
         Object result = invocation.proceed();
         long end = System.currentTimeMillis();
-        RecordTemplate recordTemplate = RecordTemplate.builder()
+        RecordTemplate recordDefault = RecordDefault.builder()
                 .Id(UUID.randomUUID().toString())
                 .clazz(invocation.getMethod().getDeclaringClass())
                 .method(invocation.getMethod().getName())
@@ -44,7 +48,7 @@ public class MethodCostAdvice implements MethodInterceptor {
                 .endTime(Instant.ofEpochMilli(end))
                 .duration(end - start)
                 .build();
-        outResult.record(recordTemplate);
+        outResult.record(recordDefault);
         return result;
     }
 

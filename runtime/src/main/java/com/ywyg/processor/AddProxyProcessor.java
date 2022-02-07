@@ -25,19 +25,16 @@ public class AddProxyProcessor implements BeanPostProcessor {
     @Override
     public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
         Class<?> clazz = bean.getClass();
-        do {
-            for (final Method method : clazz.getMethods()) {
-                if (verifyAnnotation.needRecord(method)) {
-                    ProxyFactory proxyFactory = new ProxyFactory();
-                    proxyFactory.addAdvice(methodCostAdvice);
-                    proxyFactory.setOptimize(true);
-                    proxyFactory.setFrozen(true);
-                    proxyFactory.setTarget(bean);
-                    return proxyFactory.getProxy();
-                }
+        for (final Method method : clazz.getMethods()) {
+            if (verifyAnnotation.needRecord(method)) {
+                ProxyFactory proxyFactory = new ProxyFactory();
+                proxyFactory.addAdvice(methodCostAdvice);
+                proxyFactory.setOptimize(true);
+                proxyFactory.setFrozen(true);
+                proxyFactory.setTarget(bean);
+                return proxyFactory.getProxy();
             }
-            clazz = clazz.getSuperclass();
-        } while (clazz != null);
+        }
         return bean;
     }
 

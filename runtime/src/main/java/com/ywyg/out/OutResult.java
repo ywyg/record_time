@@ -14,6 +14,7 @@ public interface OutResult {
     /**
      * 记录运行时间结果
      * @param recordTemplate 参数使用记录模版
+     * @throws IOException 记录过程产生的IO异常
      */
     void record(RecordTemplate recordTemplate) throws IOException;
 
