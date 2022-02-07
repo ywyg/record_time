@@ -8,14 +8,18 @@ import com.ywyg.es.RecordRepository;
 import com.ywyg.factory.RecordType;
 import com.ywyg.out.OutResult;
 import com.ywyg.processor.AddProxyProcessor;
+import com.ywyg.processor.ServiceLoad;
+import com.ywyg.template.MethodUpper;
 import com.ywyg.utils.VerifyAnnotation;
 import lombok.NonNull;
+import java.lang.;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.util.CollectionUtils;
 
 /**
  * @author saijie.gao
@@ -65,9 +69,15 @@ public class AutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnBean(value = {VerifyAnnotation.class, OutResult.class})
-    public MethodCostAdvice methodCostAdvice(final VerifyAnnotation verifyAnnotation, final OutResult outResult) {
-        return new MethodCostAdvice(verifyAnnotation, outResult);
+    public ServiceLoad serviceLoad() {
+        return new ServiceLoad();
+    }
+
+    @Bean
+    @ConditionalOnBean(value = {VerifyAnnotation.class, OutResult.class, ServiceLoad.class})
+    public MethodCostAdvice methodCostAdvice(final VerifyAnnotation verifyAnnotation, final OutResult outResult, final ServiceLoad serviceLoad) {
+        List<MethodUpper> values = (List<MethodUpper>) serviceLoad.getMap().values();
+        return new MethodCostAdvice(verifyAnnotation, outResult, CollectionUtils.firstElement(values));
     }
 
     @Bean
